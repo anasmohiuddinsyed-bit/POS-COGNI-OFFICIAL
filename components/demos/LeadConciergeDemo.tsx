@@ -828,12 +828,17 @@ export const LeadConciergeDemo = forwardRef<DemoActions>((props, ref) => {
         }));
       }
       if (lowerContent.match(/\$?\d+[kK]|\d+\s*(thousand|k)/)) {
-        const match = trimmedContent.match(/\$?(\d+)[kK]|\$?(\d+)\s*(thousand|k)/);
-        if (match) {
-          const amount = match[1] || match[2];
-          setQualification(prev => ({
-            ...prev,
-            budget: `$${amount}k`,
+      const match = trimmedContent.match(/\$?(\d+)[kK]|\$?(\d+)\s*(thousand|k)/);
+      if (!match) return;
+      
+      const amount = match[1] ?? match[2];
+      if (!amount) return;
+      
+      setQualification(prev => ({
+        ...prev,
+        budget: `$${amount}k`,
+      }));
+
             leadScore: 'Hot',
           }));
         }
