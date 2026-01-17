@@ -828,21 +828,19 @@ export const LeadConciergeDemo = forwardRef<DemoActions>((props, ref) => {
         }));
       }
       if (lowerContent.match(/\$?\d+[kK]|\d+\s*(thousand|k)/)) {
-      const match = trimmedContent.match(/\$?(\d+)[kK]|\$?(\d+)\s*(thousand|k)/);
-      if (!match) return;
-      
-      const amount = match[1] ?? match[2];
-      if (!amount) return;
-      
-      setQualification(prev => ({
-        ...prev,
-        budget: `$${amount}k`,
-      }));
+        const match = trimmedContent.match(/\$?(\d+)[kK]|\$?(\d+)\s*(thousand|k)/);
+if (match) {
+  const amount = match[1] ?? match[2];
 
-            leadScore: 'Hot',
-          }));
-        }
-      }
+  if (amount) {
+    setQualification(prev => ({
+      ...prev,
+      budget: `$${amount}k`,
+      leadScore: 'Hot',
+    }));
+  }
+}
+
       if (lowerContent.includes('30') && (lowerContent.includes('day') || lowerContent.includes('month'))) {
         setQualification(prev => ({
           ...prev,
