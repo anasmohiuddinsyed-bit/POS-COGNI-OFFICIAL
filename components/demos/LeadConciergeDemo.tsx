@@ -391,8 +391,11 @@ export const LeadConciergeDemo = forwardRef<DemoActions>((props, ref) => {
     if (conversationState === 'collecting-info') {
       const lowerContent = trimmedContent.toLowerCase();
       
-      // Check all previous user messages for budget and timeline to avoid re-asking
-      const previousUserMessages = messages.filter(m => m.role === 'user' && m.type === type);
+      // CRITICAL FIX: Use messagesRef.current instead of messages state
+      // State updates are async, so messages state might not have the latest message yet
+      // messagesRef.current is updated immediately and includes the current message
+      const allCurrentMessages = messagesRef.current.filter(m => m.type === type);
+      const previousUserMessages = allCurrentMessages.filter(m => m.role === 'user');
       const previousText = previousUserMessages.map(m => m.content.toLowerCase()).join(' ');
       
       // Improved budget detection - handles $1M+, $900k, 800k, etc.
@@ -400,6 +403,7 @@ export const LeadConciergeDemo = forwardRef<DemoActions>((props, ref) => {
       const hasBudgetInMessage = budgetPattern.test(trimmedContent);
       
       // Check if we already have budget from previous messages (check state AND previous messages)
+      // Include current message in check by using allMessagesText below
       const alreadyHasBudget = (qualification.budget && qualification.budget.trim() !== '') ||
                                 budgetPattern.test(previousText);
       
@@ -484,7 +488,7 @@ export const LeadConciergeDemo = forwardRef<DemoActions>((props, ref) => {
       }
       
       // Determine what we have now (including current message + previous messages)
-      // Check ALL messages together to avoid missing what was just said
+      // Use allMessagesText which includes the current message to catch what was just said
       const allMessagesText = (previousText + ' ' + lowerContent).toLowerCase();
       const hasBudget = hasBudgetInMessage || alreadyHasBudget || budgetPattern.test(allMessagesText);
       const hasTimeline = hasTimelineInMessage || alreadyHasTimeline || 
